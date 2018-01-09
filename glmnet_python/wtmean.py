@@ -41,4 +41,4 @@ def isnan(x):
 
 def isfinite(x):
     return scipy.isfinite(x)        
-# end of isfinite    
+# end of isfinite

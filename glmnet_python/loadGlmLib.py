@@ -21,10 +21,10 @@ from builtins import range
 import ctypes
 import os
 
-# glmnet_so = os.path.dirname(__file__) + '/GLMnet.so'
-# glmnet_dll = os.path.dirname(__file__) + '/GLMnet.dll'
-glmnet_so = os.path.dirname(os.path.abspath(__file__)) + '/GLMnet.so'
-glmnet_dll = os.path.dirname(os.path.abspath(__file__)) + '/GLMnet.dll'
+glmnet_so = os.path.dirname(__file__) + '/GLMnet.so'
+glmnet_dll = os.path.dirname(__file__) + '/GLMnet.dll'
+# glmnet_so = os.path.dirname(os.path.abspath(__file__)) + '/GLMnet.so'
+# glmnet_dll = os.path.dirname(os.path.abspath(__file__)) + '/GLMnet.dll'
 
 
 def loadGlmLib():
