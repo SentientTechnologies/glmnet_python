@@ -4,6 +4,8 @@
 [![GPL Licence](https://badges.frapsoft.com/os/gpl/gpl.svg?v=103)](https://opensource.org/licenses/GPL-2.0/)
 [![Documentation Status](https://readthedocs.org/projects/glmnet-python/badge/?version=latest)](http://glmnet-python.readthedocs.io/en/latest/?badge=latest)
 
+This fork is meant to introduce Python 2 compatibility.
+
 ## Install
 
 Using pip (recommended)
