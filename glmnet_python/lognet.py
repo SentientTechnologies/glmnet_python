@@ -4,13 +4,19 @@ Internal function called by glmnet. See also glmnet, cvglmnet
 
 """
 # import packages/methods
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 import scipy
 import ctypes
 from loadGlmLib import loadGlmLib
 
-def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm, 
-          nobs, nvars, jd, vp, cl, ne, nx, nlam, flmin, ulam, 
-          thresh, isd, intr, maxit, kopt, family):
+
+def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm,
+           nobs, nvars, jd, vp, cl, ne, nx, nlam, flmin, ulam,
+           thresh, isd, intr, maxit, kopt, family):
 
     # load shared fortran library
     glmlib = loadGlmLib() 
@@ -22,11 +28,11 @@ def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm,
     else:
         nc = 1
         
-    if (noo != nobs):
+    if noo != nobs:
         raise ValueError('x and y have different number of rows in call to glmnet')
     
     if nc == 1:
-        classes, sy = scipy.unique(y, return_inverse = True)
+        classes, sy = scipy.unique(y, return_inverse=True)
         nc = len(classes)
         indexes = scipy.eye(nc, nc)
         y = indexes[sy, :]
@@ -40,7 +46,7 @@ def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm,
             nc = 1
             y = y[:, [1, 0]]
     #
-    if (len(weights) != 0): 
+    if len(weights) != 0:
         t = weights > 0
         if ~scipy.all(t):
             t = scipy.reshape(t, (len(y), ))
@@ -49,7 +55,7 @@ def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm,
             weights = weights[t]
             nobs = scipy.sum(t)
         else:
-            t = scipy.empty([0], dtype = scipy.integer)
+            t = scipy.empty([0], dtype=scipy.integer)
         #
         if len(y.shape) == 1:
             mv = len(y)
@@ -85,16 +91,16 @@ def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm,
     ######################################
     # force inputs into fortran order and scipy float64
     copyFlag = False
-    x = x.astype(dtype = scipy.float64, order = 'F', copy = copyFlag) 
-    irs = irs.astype(dtype = scipy.int32, order = 'F', copy = copyFlag)
-    pcs = pcs.astype(dtype = scipy.int32, order = 'F', copy = copyFlag)    
-    y = y.astype(dtype = scipy.float64, order = 'F', copy = copyFlag)    
-    weights = weights.astype(dtype = scipy.float64, order = 'F', copy = copyFlag)    
-    offset = offset.astype(dtype = scipy.float64, order = 'F', copy = copyFlag)    
-    jd = jd.astype(dtype = scipy.int32, order = 'F', copy = copyFlag)        
-    vp = vp.astype(dtype = scipy.float64, order = 'F', copy = copyFlag)    
-    cl = cl.astype(dtype = scipy.float64, order = 'F', copy = copyFlag)    
-    ulam   = ulam.astype(dtype = scipy.float64, order = 'F', copy = copyFlag)    
+    x = x.astype(dtype=scipy.float64, order='F', copy=copyFlag)
+    irs = irs.astype(dtype=scipy.int32, order='F', copy=copyFlag)
+    pcs = pcs.astype(dtype=scipy.int32, order='F', copy=copyFlag)
+    y = y.astype(dtype=scipy.float64, order='F', copy=copyFlag)
+    weights = weights.astype(dtype=scipy.float64, order='F', copy=copyFlag)
+    offset = offset.astype(dtype=scipy.float64, order='F', copy=copyFlag)
+    jd = jd.astype(dtype=scipy.int32, order='F', copy=copyFlag)
+    vp = vp.astype(dtype=scipy.float64, order='F', copy=copyFlag)
+    cl = cl.astype(dtype=scipy.float64, order='F', copy=copyFlag)
+    ulam = ulam.astype(dtype=scipy.float64, order='F', copy=copyFlag)
 
     ######################################
     # --------- ALLOCATE OUTPUTS ---------
@@ -104,32 +110,32 @@ def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm,
     lmu_r = ctypes.c_int(lmu)
     # a0, ca
     if nc == 1:
-        a0   = scipy.zeros([nlam], dtype = scipy.float64)
-        ca = scipy.zeros([nx, nlam], dtype = scipy.float64)
+        a0 = scipy.zeros([nlam], dtype=scipy.float64)
+        ca = scipy.zeros([nx, nlam], dtype=scipy.float64)
     else:
-        a0   = scipy.zeros([nc, nlam], dtype = scipy.float64)
-        ca   = scipy.zeros([nx, nc, nlam], dtype = scipy.float64)
+        a0 = scipy.zeros([nc, nlam], dtype=scipy.float64)
+        ca = scipy.zeros([nx, nc, nlam], dtype=scipy.float64)
     # a0
-    a0   = a0.astype(dtype = scipy.float64, order = 'F', copy = False)    
+    a0 = a0.astype(dtype=scipy.float64, order='F', copy=False)
     a0_r = a0.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
     # ca    
-    ca   = ca.astype(dtype = scipy.float64, order = 'F', copy = False)    
+    ca = ca.astype(dtype = scipy.float64, order='F', copy=False)
     ca_r = ca.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
     # ia
-    ia   = -1*scipy.ones([nx], dtype = scipy.int32)
-    ia   = ia.astype(dtype = scipy.int32, order = 'F', copy = False)    
+    ia = -1*scipy.ones([nx], dtype=scipy.int32)
+    ia = ia.astype(dtype=scipy.int32, order='F', copy=False)
     ia_r = ia.ctypes.data_as(ctypes.POINTER(ctypes.c_int))
     # nin
-    nin   = -1*scipy.ones([nlam], dtype = scipy.int32)
-    nin   = nin.astype(dtype = scipy.int32, order = 'F', copy = False)    
+    nin = -1*scipy.ones([nlam], dtype=scipy.int32)
+    nin = nin.astype(dtype=scipy.int32, order='F', copy=False)
     nin_r = nin.ctypes.data_as(ctypes.POINTER(ctypes.c_int))
     # dev
-    dev   = -1*scipy.ones([nlam], dtype = scipy.float64)
-    dev   = dev.astype(dtype = scipy.float64, order = 'F', copy = False)    
+    dev = -1*scipy.ones([nlam], dtype=scipy.float64)
+    dev = dev.astype(dtype=scipy.float64, order='F', copy=False)
     dev_r = dev.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
     # alm
-    alm   = -1*scipy.ones([nlam], dtype = scipy.float64)
-    alm   = alm.astype(dtype = scipy.float64, order = 'F', copy = False)    
+    alm = -1*scipy.ones([nlam], dtype=scipy.float64)
+    alm = alm.astype(dtype=scipy.float64, order='F', copy=False)
     alm_r = alm.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
     # nlp
     nlp = -1
@@ -220,9 +226,9 @@ def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm,
     #  ###################################  
     
     # check for error
-    if (jerr_r.value > 0):
+    if jerr_r.value > 0:
         raise ValueError("Fatal glmnet error in library call : error code = ", jerr_r.value)
-    elif (jerr_r.value < 0):
+    elif jerr_r.value < 0:
         print("Warning: Non-fatal error in glmnet library call: error code = ", jerr_r.value)
         print("Check results for accuracy. Partial or no results returned.")
     
@@ -251,7 +257,7 @@ def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm,
     if family == 'multinomial':
         a0 = a0 - scipy.tile(scipy.mean(a0), (nc, 1))
         dfmat = a0.copy()
-        dd = scipy.array([nvars, lmu], dtype = scipy.integer)
+        dd = scipy.array([nvars, lmu], dtype=scipy.integer)
         beta_list = list()
         if ninmax > 0:
             # TODO: is the reshape here done right?
@@ -266,16 +272,16 @@ def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm,
             for k in range(0, nc):
                 ca1 = scipy.reshape(ca[:,k,:], (ninmax, lmu))
                 cak = ca1[oja,:]
-                dfmat[k, :] = scipy.sum(scipy.absolute(cak) > 0, axis = 0)
-                beta = scipy.zeros([nvars, lmu], dtype = scipy.float64)
+                dfmat[k, :] = scipy.sum(scipy.absolute(cak) > 0, axis=0)
+                beta = scipy.zeros([nvars, lmu], dtype=scipy.float64)
                 beta[ja1, :] = cak
                 beta_list.append(beta)
         else:
             for k in range(0, nc):
-                dfmat[k, :] = scipy.zeros([1, lmu], dtype = scipy.float64)
-                beta_list.append(scipy.zeros([nvars, lmu], dtype = scipy.float64))
+                dfmat[k, :] = scipy.zeros([1, lmu], dtype=scipy.float64)
+                beta_list.append(scipy.zeros([nvars, lmu], dtype=scipy.float64))
             #
-            df = scipy.zeros([1, lmu], dtype = scipy.float64)
+            df = scipy.zeros([1, lmu], dtype=scipy.float64)
         #
         if kopt == 2:
             grouped = True
@@ -298,18 +304,18 @@ def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm,
         fit['offset'] = is_offset
         fit['class'] = 'multnet'    
     else:
-        dd = scipy.array([nvars, lmu], dtype = scipy.integer)
+        dd = scipy.array([nvars, lmu], dtype=scipy.integer)
         if ninmax > 0:
-            ca = ca[0:ninmax,:];
-            df = scipy.sum(scipy.absolute(ca) > 0, axis = 0);
-            ja = ia[0:ninmax] - 1; # ia is 1-indexes in fortran
+            ca = ca[0:ninmax,:]
+            df = scipy.sum(scipy.absolute(ca) > 0, axis=0)
+            ja = ia[0:ninmax] - 1  # ia is 1-indexes in fortran
             oja = scipy.argsort(ja)
             ja1 = ja[oja]
-            beta = scipy.zeros([nvars, lmu], dtype = scipy.float64);
-            beta[ja1, :] = ca[oja, :];
+            beta = scipy.zeros([nvars, lmu], dtype=scipy.float64)
+            beta[ja1, :] = ca[oja, :]
         else:
-            beta = scipy.zeros([nvars,lmu], dtype = scipy.float64);
-            df = scipy.zeros([1,lmu], dtype = scipy.float64);
+            beta = scipy.zeros([nvars,lmu], dtype=scipy.float64)
+            df = scipy.zeros([1,lmu], dtype=scipy.float64)
         #
         fit = dict()
         fit['a0'] = a0
@@ -333,5 +339,4 @@ def lognet(x, is_sparse, irs, pcs, y, weights, offset, parm,
     return fit
 #----------------------------------------- 
 # end of method lognet
-#----------------------------------------- 
-    
+#-----------------------------------------

@@ -74,23 +74,29 @@
       cvglmnetPredict(cvfit, x[0:5, :], scipy.array([0.0866, 0.2323]))
 
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 from cvglmnetCoef import cvglmnetCoef
 from glmnetPredict import glmnetPredict
 import scipy
 
-def cvglmnetPredict(obj, newx = None, s = 'lambda_1se', **options):
+
+def cvglmnetPredict(obj, newx=None, s='lambda_1se', **options):
     if newx is None:
         CVpred = cvglmnetCoef(obj)
-        return(CVpred)
+        return CVpred
         
     if type(s) == scipy.ndarray and s.dtype == 'float64':
         lambdau = s
     elif s in ['lambda_1se', 'lambda_min']:
-            lambdau = obj[s]
+        lambdau = obj[s]
     else:
-            raise ValueError('Invalid form for s')
+        raise ValueError('Invalid form for s')
     
     CVpred = glmnetPredict(obj['glmnet_fit'], newx, lambdau, **options)
     
-    return(CVpred)
+    return CVpred
     

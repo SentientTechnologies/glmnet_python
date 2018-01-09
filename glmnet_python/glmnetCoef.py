@@ -67,11 +67,16 @@
     ncoef = glmnetCoef(fit,scipy.array([0.01, 0.001]));
 
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
 
 import scipy
 from glmnetPredict import glmnetPredict
 
-def glmnetCoef(obj, s = None, exact = False):
+
+def glmnetCoef(obj, s=None, exact=False):
     
     if s is None:
         s = obj['lambdau']
@@ -81,6 +86,4 @@ def glmnetCoef(obj, s = None, exact = False):
         
     result = glmnetPredict(obj, scipy.empty([0]), s, 'coefficients')    
     
-    return(result)
-    
-    
+    return result

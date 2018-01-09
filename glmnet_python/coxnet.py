@@ -6,13 +6,19 @@ time -- column 0
 status -- column 1
 """
 # import packages/methods
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 import scipy
 import ctypes
 from loadGlmLib import loadGlmLib
-    
+
+
 def coxnet(x, is_sparse, irs, pcs, y, weights, offset, parm,
-          nobs, nvars, jd, vp, cl, ne, nx, nlam, flmin, ulam, 
-          thresh, isd, maxit, family):
+           nobs, nvars, jd, vp, cl, ne, nx, nlam, flmin, ulam,
+           thresh, isd, maxit, family):
     
     # load shared fortran library
     glmlib = loadGlmLib() 

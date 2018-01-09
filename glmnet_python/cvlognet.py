@@ -3,21 +3,26 @@
 Internal function called by cvglmnet. See also cvglmnet
 
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 import scipy
 from glmnetPredict import glmnetPredict
 from wtmean import wtmean
 from cvcompute import cvcompute
 
-def cvlognet(fit, \
-            lambdau, \
-            x, \
-            y, \
-            weights, \
-            offset, \
-            foldid, \
-            ptype, \
-            grouped, \
-            keep = False):
+
+def cvlognet(fit,
+             lambdau,
+             x,
+             y,
+             weights,
+             offset,
+             foldid,
+             ptype,
+             grouped,keep=False):
     
     typenames = {'deviance':'Binomial Deviance', 'mse':'Mean-Squared Error', 
                  'mae':'Mean Absolute Error', 'auc':'AUC', 'class':'Misclassification Error'}
@@ -127,7 +132,8 @@ def cvlognet(fit, \
     if keep:
         result['fit_preval'] = predmat
         
-    return(result)
+    return result
+
 
 # end of cvelnet
 #=========================    
@@ -135,7 +141,7 @@ def cvlognet(fit, \
 #=========================    
 # Helper functions
 #=========================    
-def auc_mat(y, prob, weights = None):
+def auc_mat(y, prob, weights=None):
     if weights == None or len(weights) == 0:
         weights = scipy.ones([y.shape[0], 1])
     wweights = weights*y
@@ -147,14 +153,16 @@ def auc_mat(y, prob, weights = None):
     yy = scipy.vstack((a, b))
     pprob = scipy.vstack((prob,prob))
     result = auc(yy, pprob, wweights)
-    return(result)
+    return result
+
+
 #=========================    
 def auc(y, prob, w):
     if len(w) == 0:
         mindiff = scipy.amin(scipy.diff(scipy.unique(prob)))
         pert = scipy.random.uniform(0, mindiff/3, prob.size)
-        t, rprob = scipy.unique(prob + pert, return_inverse = True)
-        n1 = scipy.sum(y, keepdims = True)
+        t, rprob = scipy.unique(prob + pert, return_inverse=True)
+        n1 = scipy.sum(y, keepdims=True)
         n0 = y.shape[0] - n1
         u = scipy.sum(rprob[y == 1]) - n1*(n1 + 1)/2
         result = u/(n1*n0)
@@ -169,5 +177,5 @@ def auc(y, prob, w):
         sumw = cw1[-1]
         sumw = sumw*(c1[-1] - sumw)
         result = wauc/sumw
-    return(result)    
+    return result
 #=========================    

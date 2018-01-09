@@ -4,8 +4,14 @@ Internal glmnet function. See also cvglmnet.
 
 Compute the weighted mean and SD within folds, and hence the SE of the mean
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 import scipy
 from wtmean import wtmean
+
 
 def cvcompute(mat, weights, foldid, nlams):
     if len(weights.shape) > 1:
@@ -27,7 +33,7 @@ def cvcompute(mat, weights, foldid, nlams):
     cvcpt['weights'] = wisum
     cvcpt['N'] = N
 
-    return(cvcpt)
+    return cvcpt
 
 # end of cvcompute
 #=========================    

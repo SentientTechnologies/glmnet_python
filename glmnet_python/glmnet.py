@@ -15,17 +15,17 @@ DESCRIPTION:
     with all shapes of data, including very large sparse data matrices. 
     Fits linear, logistic and multinomial, Poisson, and Cox regression 
     models.
-    
+
 EXTERNAL FUNCTIONS:
 ------------------
     options = glmnetSet()   # provided with this (glmnet python) package    
-    
+
 INPUT ARGUMENTS:
 ---------------
   x        Input scipy 2D array of nobs x nvars (required). Each row is an 
            observation vector. Can be in sparse matrix format. Must be in 
            scipy csc_matrix format
-           
+
   y        Response variable (scipy 2D array of size nobs x 1, nobs x nc, etc). (required) 
            For family = 'gaussian', Quantitative column vector
            For family = 'poisson' (non-negative counts), Quantitative column vector
@@ -38,7 +38,7 @@ INPUT ARGUMENTS:
              with 1 indicating death and 0 indicating right censored. 
            For family = 'mgaussian', y is an array of quantitative responses.
            (see examples for illustrations)
-           
+
   family   Response type. Default is 'gaussian'. (optional)
            Currently, 'gaussian', 'poisson', 'binomial', 'multinomial', 'mgaussian'
            and 'cox' are supported
@@ -100,13 +100,13 @@ EXAMPLES:
       y = scipy.random.rand(100,3)
       fit = glmnet(x, y, 'mgaussian')      
       glmnetPlot(fit, 'norm', False, '2norm')
-      
+
       # Binomial
       x = scipy.random.rand(100, 10)
       y = scipy.random.rand(100,1)
       y = (y > 0.5)*1.0
       fit = glmnet(x = x, y = y, family = 'binomial', alpha = 0.5)    
-      
+
       # Multinomial
       x = scipy.random.rand(100,10)
       y = scipy.random.rand(100,1)
@@ -119,7 +119,7 @@ EXAMPLES:
       x = scipy.random.rand(100,10)
       y = scipy.random.poisson(size = [100, 1])*1.0
       fit = glmnet(x = x, y = y, family = 'poisson')
-      
+
       # cox
       N = 1000; p = 30;
       nzc = p/3;
@@ -133,7 +133,7 @@ EXAMPLES:
       y = scipy.column_stack((ty, tcens))
       fit = glmnet(x = x.copy(), y = y.copy(), family = 'cox')
       glmnetPlot(fit)
-      
+
       # sparse example
       N = 1000000;
       x = scipy.random.normal(size = [N,10])
@@ -152,7 +152,7 @@ EXAMPLES:
       en = time.time()
       print("time elapsed (full) = ", en - st)
       print("nbytes = ", x.data.nbytes)
- 
+
 DETAILS:
 -------
    The sequence of models implied by lambda is fit by coordinate descent.
@@ -174,7 +174,7 @@ DETAILS:
    objective function for 'gaussian' is
 
                    1/2 RSS / nobs + lambda * penalty,
-                   
+
    and for the logistic models it is
 
                     -loglik / nobs + lambda * penalty.
@@ -217,7 +217,7 @@ REFERENCES:
     Friedman, J., Hastie, T. and Tibshirani, R. (2008) Regularization Paths for Generalized Linear Models via Coordinate Descent, 
     http://www.jstatsoft.org/v33/i01/
     Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010
-    
+
     Simon, N., Friedman, J., Hastie, T., Tibshirani, R. (2011) Regularization Paths for Cox's Proportional Hazards Model via Coordinate Descent,
     http://www.jstatsoft.org/v39/i05/
     Journal of Statistical Software, Vol. 39(5) 1-13
@@ -234,80 +234,87 @@ SEE ALSO:
 """
 
 # import packages/methods
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 from glmnetSet import glmnetSet
 from glmnetControl import glmnetControl
-import scipy
 from elnet import elnet
 from lognet import lognet
 from coxnet import coxnet
 from mrelnet import mrelnet
 from fishnet import fishnet
 
-def glmnet(*, x, y, family='gaussian', **options):
-        
+import scipy
+
+
+def glmnet(x, y, family='gaussian', **options):
     # check inputs: make sure x and y are scipy, float64 arrays
-    # fortran order is not checked as we force a convert later 
-    if not( isinstance(x, scipy.sparse.csc.csc_matrix) ):
-        if not( isinstance(x, scipy.ndarray) and x.dtype == 'float64'):
+    # fortran order is not checked as we force a convert later
+    if not (isinstance(x, scipy.sparse.csc.csc_matrix)):
+        if not (isinstance(x, scipy.ndarray) and x.dtype == 'float64'):
             raise ValueError('x input must be a scipy float64 ndarray')
     else:
         if not (x.dtype == 'float64'):
             raise ValueError('x input must be a float64 array')
-            
-    if not( isinstance(y, scipy.ndarray) and y.dtype == 'float64'):
-            raise ValueError('y input must be a scipy float64 ndarray')
+
+    if not (isinstance(y, scipy.ndarray) and y.dtype == 'float64'):
+        raise ValueError('y input must be a scipy float64 ndarray')
 
     # create options
     if options is None:
-        options = glmnetSet();
-    
+        options = glmnetSet()
+
     ## match the family, abbreviation allowed
-    fambase = ['gaussian','binomial','poisson','multinomial','cox','mgaussian'];
+    fambase = ['gaussian', 'binomial', 'poisson', 'multinomial', 'cox', 'mgaussian']
     # find index of family in fambase
-    indxtf = [x.startswith(family.lower()) for x in fambase] # find index of family in fambase
+    indxtf = [fam.startswith(family.lower()) for fam in fambase]  # find index of family in fambase
     famind = [i for i in range(len(indxtf)) if indxtf[i] == True]
     if len(famind) == 0:
-        raise ValueError('Family should be one of ''gaussian'', ''binomial'', ''poisson'', ''multinomial'', ''cox'', ''mgaussian''')
+        raise ValueError(
+            'Family should be one of ''gaussian'', ''binomial'', ''poisson'', ''multinomial'', ''cox'', ''mgaussian''')
     elif len(famind) > 1:
-        raise ValueError('Family could not be uniquely determined : Use a longer description of the family string.')        
+        raise ValueError('Family could not be uniquely determined : Use a longer description of the family string.')
     else:
-        family = fambase[famind[0]] 
-    
+        family = fambase[famind[0]]
+
     ## prepare options
     options = glmnetSet(options)
-    #print('glmnet.py options:')
-    #print(options)
-    
+    # print('glmnet.py options:')
+    # print(options)
+
     ## error check options parameters
     alpha = scipy.float64(options['alpha'])
-    if alpha > 1.0 :
+    if alpha > 1.0:
         print('Warning: alpha > 1.0; setting to 1.0')
         options['alpha'] = scipy.float64(1.0)
- 
-    if alpha < 0.0 :
+
+    if alpha < 0.0:
         print('Warning: alpha < 0.0; setting to 0.0')
         options['alpha'] = scipy.float64(0.0)
 
-    parm  = scipy.float64(options['alpha'])
-    nlam  = scipy.int32(options['nlambda'])
-    nobs, nvars  = x.shape
-    
+    parm = scipy.float64(options['alpha'])
+    nlam = scipy.int32(options['nlambda'])
+    nobs, nvars = x.shape
+
     # check weights length
     weights = options['weights']
     if len(weights) == 0:
-        weights = scipy.ones([nobs, 1], dtype = scipy.float64)
+        weights = scipy.ones([nobs, 1], dtype=scipy.float64)
     elif len(weights) != nobs:
         raise ValueError('Error: Number of elements in ''weights'' not equal to number of rows of ''x''')
     # check if weights are scipy nd array
-    if not( isinstance(weights, scipy.ndarray) and weights.dtype == 'float64'):
+    if not (isinstance(weights, scipy.ndarray) and weights.dtype == 'float64'):
         raise ValueError('weights input must be a scipy float64 ndarray')
-    
+
     # check y length
     nrowy = y.shape[0]
     if nrowy != nobs:
         raise ValueError('Error: Number of elements in ''y'' not equal to number of rows of ''x''')
-    
-    # check ne   
+
+    # check ne
     ne = options['dfmax']
     if len(ne) == 0:
         ne = nvars + 1
@@ -315,7 +322,7 @@ def glmnet(*, x, y, family='gaussian', **options):
     # check nx
     nx = options['pmax']
     if len(nx) == 0:
-        nx = min(ne*2 + 20, nvars)
+        nx = min(ne * 2 + 20, nvars)
 
     # check jd
     exclude = options['exclude']
@@ -324,39 +331,38 @@ def glmnet(*, x, y, family='gaussian', **options):
         exclude = scipy.unique(exclude)
         if scipy.any(exclude < 0) or scipy.any(exclude >= nvars):
             raise ValueError('Error: Some excluded variables are out of range')
-        else:    
-            jd = scipy.append(len(exclude), exclude + 1) # indices are 1-based in fortran
+        else:
+            jd = scipy.append(len(exclude), exclude + 1)  # indices are 1-based in fortran
     else:
-        jd = scipy.zeros([1,1], dtype = scipy.integer)
+        jd = scipy.zeros([1, 1], dtype=scipy.integer)
 
-    # check vp    
+    # check vp
     vp = options['penalty_factor']
     if len(vp) == 0:
         vp = scipy.ones([1, nvars])
-    
+
     # inparms
     inparms = glmnetControl()
-    
+
     # cl
     cl = options['cl']
-    if any(cl[0,:] > 0):
+    if any(cl[0, :] > 0):
         raise ValueError('Error: The lower bound on cl must be non-positive')
 
-    if any(cl[1,:] < 0):
+    if any(cl[1, :] < 0):
         raise ValueError('Error: The lower bound on cl must be non-negative')
-        
-    cl[0, cl[0, :] == scipy.float64('-inf')] = -1.0*inparms['big']    
-    cl[1, cl[1, :] == scipy.float64('inf')]  =  1.0*inparms['big']    
-    
+
+    cl[0, cl[0, :] == scipy.float64('-inf')] = -1.0 * inparms['big']
+    cl[1, cl[1, :] == scipy.float64('inf')] = 1.0 * inparms['big']
+
     if cl.shape[1] < nvars:
         if cl.shape[1] == 1:
-            cl = cl*scipy.ones([1, nvars])
+            cl = cl * scipy.ones([1, nvars])
         else:
             raise ValueError('Error: Require length 1 or nvars lower and upper limits')
     else:
         cl = cl[:, 0:nvars]
-        
-        
+
     exit_rec = 0
     if scipy.any(cl == 0.0):
         fdev = inparms['fdev']
@@ -365,88 +371,89 @@ def glmnet(*, x, y, family='gaussian', **options):
             optset['fdev'] = 0
             glmnetControl(optset)
             exit_rec = 1
-             
-    isd  = scipy.int32(options['standardize'])
+
+    isd = scipy.int32(options['standardize'])
     intr = scipy.int32(options['intr'])
     if (intr == True) and (family == 'cox'):
         print('Warning: Cox model has no intercept!')
-        
-    jsd        = scipy.int32(options['standardize_resp'])
-    thresh     = options['thresh']    
-    lambdau    = options['lambdau']
+
+    jsd = scipy.int32(options['standardize_resp'])
+    thresh = options['thresh']
+    lambdau = options['lambdau']
     lambda_min = options['lambda_min']
-    
+
     if len(lambda_min) == 0:
         if nobs < nvars:
             lambda_min = 0.01
         else:
             lambda_min = 1e-4
-    
+
     lempty = (len(lambdau) == 0)
     if lempty:
-        if (lambda_min >= 1):
+        if lambda_min >= 1:
             raise ValueError('ERROR: lambda_min should be less than 1')
         flmin = lambda_min
-        ulam  = scipy.zeros([1,1], dtype = scipy.float64)
+        ulam = scipy.zeros([1, 1], dtype=scipy.float64)
     else:
         flmin = 1.0
         if any(lambdau < 0):
             raise ValueError('ERROR: lambdas should be non-negative')
-        
-        ulam = -scipy.sort(-lambdau)    # reverse sort
+
+        ulam = -scipy.sort(-lambdau)  # reverse sort
         nlam = lambdau.size
-    
-    maxit =  scipy.int32(options['maxit'])
+
+    maxit = scipy.int32(options['maxit'])
     gtype = options['gtype']
     if len(gtype) == 0:
-        if (nvars < 500):
+        if nvars < 500:
             gtype = 'covariance'
         else:
             gtype = 'naive'
-    
+
     # ltype
     ltype = options['ltype']
     ltypelist = ['newton', 'modified.newton']
-    indxtf    = [x.startswith(ltype.lower()) for x in ltypelist]
-    indl      = [i for i in range(len(indxtf)) if indxtf[i] == True]
+    indxtf = [lt.startswith(ltype.lower()) for lt in ltypelist]
+    indl = [i for i in range(len(indxtf)) if indxtf[i] == True]
     if len(indl) != 1:
         raise ValueError('ERROR: ltype should be one of ''Newton'' or ''modified.Newton''')
     else:
         kopt = indl[0]
-    
+
     if family == 'multinomial':
         mtype = options['mtype']
         mtypelist = ['ungrouped', 'grouped']
-        indxtf    = [x.startswith(mtype.lower()) for x in mtypelist]
-        indm      = [i for i in range(len(indxtf)) if indxtf[i] == True]
+        indxtf = [mt.startswith(mtype.lower()) for mt in mtypelist]
+        indm = [i for i in range(len(indxtf)) if indxtf[i] == True]
         if len(indm) == 0:
             raise ValueError('Error: mtype should be one of ''ungrouped'' or ''grouped''')
-        elif (indm == 2):
+        elif indm == 2:
             kopt = 2
     #
     offset = options['offset']
-    # sparse (if is_sparse, convert to compressed sparse row format)   
+    # sparse (if is_sparse, convert to compressed sparse row format)
     is_sparse = False
     if scipy.sparse.issparse(x):
         is_sparse = True
-        tx = scipy.sparse.csc_matrix(x, dtype = scipy.float64)
-        x = tx.data; x = x.reshape([len(x), 1])
+        tx = scipy.sparse.csc_matrix(x, dtype=scipy.float64)
+        x = tx.data
+        x = x.reshape([len(x), 1])
         irs = tx.indices + 1
         pcs = tx.indptr + 1
-        irs = scipy.reshape(irs, [len(irs),])
-        pcs = scipy.reshape(pcs, [len(pcs),])        
+        irs = scipy.reshape(irs, [len(irs), ])
+        pcs = scipy.reshape(pcs, [len(pcs), ])
     else:
         irs = scipy.empty([0])
         pcs = scipy.empty([0])
-        
+
     if scipy.sparse.issparse(y):
         y = y.todense()
-    
+
     ## finally call the appropriate fit code
     if family == 'gaussian':
         # call elnet
-        fit = elnet(x, is_sparse, irs, pcs, y, weights, offset, gtype, parm, 
-                    lempty, nvars, jd, vp, cl, ne, nx, nlam, flmin, ulam, 
+        fit = elnet(x, is_sparse, irs, pcs, y, weights, offset, gtype, parm,
+                    lempty, nvars, jd, vp, cl, ne, nx, nlam, flmin, ulam,
                     thresh, isd, intr, maxit, family)
     elif (family == 'binomial') or (family == 'multinomial'):
         # call lognet
@@ -460,24 +467,24 @@ def glmnet(*, x, y, family='gaussian', **options):
                      thresh, isd, maxit, family)
     elif family == 'mgaussian':
         # call mrelnet
-        fit = mrelnet(x, is_sparse, irs, pcs, y, weights, offset, parm, 
-                      nobs, nvars, jd, vp, cl, ne, nx, nlam, flmin, ulam, 
+        fit = mrelnet(x, is_sparse, irs, pcs, y, weights, offset, parm,
+                      nobs, nvars, jd, vp, cl, ne, nx, nlam, flmin, ulam,
                       thresh, isd, jsd, intr, maxit, family)
     elif family == 'poisson':
         # call fishnet
         fit = fishnet(x, is_sparse, irs, pcs, y, weights, offset, parm,
                       nobs, nvars, jd, vp, cl, ne, nx, nlam, flmin, ulam,
-                      thresh, isd, intr, maxit, family); 
+                      thresh, isd, intr, maxit, family);
     else:
         raise ValueError('calling a family of fits that has not been implemented yet')
-            
+
     if exit_rec == 1:
         optset['fdev'] = fdev
-        #TODO: Call glmnetControl(optset) to set persistent parameters
-        
+        # TODO: Call glmnetControl(optset) to set persistent parameters
+
     # return fit
     return fit
 
-#----------------------------------------- 
+# -----------------------------------------
 # end of method glmnet   
-#----------------------------------------- 
+# -----------------------------------------

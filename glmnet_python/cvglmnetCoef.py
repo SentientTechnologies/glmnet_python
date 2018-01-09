@@ -68,11 +68,16 @@
     ncoef=cvglmnetCoef(cvfit,'lambda_min');
     
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
 
 import scipy
 from glmnetCoef import glmnetCoef
 
-def cvglmnetCoef(obj, s = None):
+
+def cvglmnetCoef(obj, s=None):
     
     if s is None or len(s) == 0:
         s = obj['lambda_1se']
@@ -90,6 +95,4 @@ def cvglmnetCoef(obj, s = None):
         
     result = glmnetCoef(obj['glmnet_fit'], lambdau)
     
-    return(result)
-    
-    
+    return result

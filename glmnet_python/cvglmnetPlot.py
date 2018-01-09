@@ -63,11 +63,15 @@
     cvglmnetPlot(fit3)
      
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
 
 import scipy
 
 
-def cvglmnetPlot(cvobject, sign_lambda = 1.0, **options):
+def cvglmnetPlot(cvobject, sign_lambda=1.0, **options):
     import matplotlib.pyplot as plt
     
     sloglam = sign_lambda*scipy.log(cvobject['lambdau'])
@@ -76,25 +80,23 @@ def cvglmnetPlot(cvobject, sign_lambda = 1.0, **options):
     ax1 = plt.gca()
     #fig, ax1 = plt.subplots()    
     
-    plt.errorbar(sloglam, cvobject['cvm'], cvobject['cvsd'], \
-                 ecolor = (0.5, 0.5, 0.5), \
-                 **options
-                 )
-    plt.hold(True)         
-    plt.plot(sloglam, cvobject['cvm'], linestyle = 'dashed',\
-             marker = 'o', markerfacecolor = 'r')             
+    plt.errorbar(sloglam, cvobject['cvm'], cvobject['cvsd'],
+                 ecolor=(0.5, 0.5, 0.5),
+                 **options)
+    plt.plot(sloglam, cvobject['cvm'], linestyle='dashed',
+             marker='o', markerfacecolor='r')
     
     xlim1 = ax1.get_xlim()
     ylim1 = ax1.get_ylim()
     
     xval = sign_lambda*scipy.log(scipy.array([cvobject['lambda_min'], cvobject['lambda_min']]))
-    plt.plot(xval, ylim1, color = 'b', linestyle = 'dashed', \
-             linewidth = 1)
+    plt.plot(xval, ylim1, color='b', linestyle='dashed',
+             linewidth=1)
         
     if cvobject['lambda_min'] != cvobject['lambda_1se']:
         xval = sign_lambda*scipy.log([cvobject['lambda_1se'], cvobject['lambda_1se']])
-        plt.plot(xval, ylim1, color = 'b', linestyle = 'dashed', \
-             linewidth = 1)
+        plt.plot(xval, ylim1, color='b', linestyle='dashed',
+                 linewidth=1)
 
     ax2 = ax1.twiny()
     ax2.xaxis.tick_top()

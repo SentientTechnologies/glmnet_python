@@ -3,21 +3,27 @@
 Internal cvglmnet function. See also cvglmnet.
 
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 import scipy
 from glmnetPredict import glmnetPredict
 from wtmean import wtmean
 from cvcompute import cvcompute
 
-def cvelnet(fit, \
-            lambdau, \
-            x, \
-            y, \
-            weights, \
-            offset, \
-            foldid, \
-            ptype, \
-            grouped, \
-            keep = False):
+
+def cvelnet(fit,
+            lambdau,
+            x,
+            y,
+            weights,
+            offset,
+            foldid,
+            ptype,
+            grouped,
+            keep=False):
     
     typenames = {'deviance':'Mean-Squared Error', 'mse':'Mean-Squared Error', 
                  'mae':'Mean Absolute Error'}
@@ -77,7 +83,7 @@ def cvelnet(fit, \
     if keep:
         result['fit_preval'] = predmat
         
-    return(result)
+    return result
 
 # end of cvelnet
 #=========================    

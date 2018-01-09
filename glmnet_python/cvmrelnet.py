@@ -3,21 +3,27 @@
 Internal function called by cvglmnet. See also cvglmnet
 
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 import scipy
 from glmnetPredict import glmnetPredict
 from wtmean import wtmean
 from cvcompute import cvcompute
 
-def cvmrelnet(fit, \
-            lambdau, \
-            x, \
-            y, \
-            weights, \
-            offset, \
-            foldid, \
-            ptype, \
-            grouped, \
-            keep = False):
+
+def cvmrelnet(fit,
+              lambdau,
+              x,
+              y,
+              weights,
+              offset,
+              foldid,
+              ptype,
+              grouped,
+              keep=False):
     
     typenames = {'deviance':'Mean-Squared Error', 'mse':'Mean-Squared Error', 
                  'mae':'Mean Absolute Error'}
@@ -46,15 +52,15 @@ def cvmrelnet(fit, \
         predmat[which, 0:nlami] = preds
         nlams.append(nlami)
     # convert nlams to scipy array
-    nlams = scipy.array(nlams, dtype = scipy.integer)
+    nlams = scipy.array(nlams, dtype=scipy.integer)
 
-    N = nobs - scipy.reshape(scipy.sum(scipy.isnan(predmat[:, 1, :]), axis = 0), (1, -1))
+    N = nobs - scipy.reshape(scipy.sum(scipy.isnan(predmat[:, 1, :]), axis=0), (1, -1))
     bigY = scipy.tile(y[:, :, None], [1, 1, lambdau.size])
 
     if ptype == 'mse':
-        cvraw = scipy.sum((bigY - predmat)**2, axis = 1).squeeze()
+        cvraw = scipy.sum((bigY - predmat)**2, axis=1).squeeze()
     elif ptype == 'mae':
-        cvraw = scipy.sum(scipy.absolute(bigY - predmat), axis = 1).squeeze()
+        cvraw = scipy.sum(scipy.absolute(bigY - predmat), axis=1).squeeze()
         
     if y.size/nfolds < 3 and grouped == True:
         print('Option grouped=false enforced in cv.glmnet, since < 3 observations per fold')
@@ -78,7 +84,7 @@ def cvmrelnet(fit, \
     if keep:
         result['fit_preval'] = predmat
         
-    return(result)
+    return result
 
 # end of cvelnet
 #=========================    

@@ -68,12 +68,17 @@
  SEE ALSO:
     glmnet.
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
 
-def glmnetControl(pars = None):
+
+def glmnetControl(pars=None):
     import scipy
     
     # default options
-    ivals = dict();
+    ivals = dict()
     ivals["fdev"]    = scipy.float64(1e-5)
     ivals["devmax"]  = scipy.float64(0.999)
     ivals["eps"]     = scipy.float64(1e-6)
@@ -85,17 +90,18 @@ def glmnetControl(pars = None):
     ivals["mxit"]    = scipy.float64(100)
     
     # quick return if no user opts
-    if pars == None:
+    if pars is None:
         return ivals
     
     # if options are passed in by user, update options with values from opts
-    parsInIvals = set(pars.keys()) - set(ivals.keys());
+    parsInIvals = set(pars.keys()) - set(ivals.keys())
     if len(parsInIvals) > 0:          # assert 'opts' keys are subsets of 'options' keys
         raise ValueError('attempting to set glmnet controls that are not known to glmnetControl')
     else:        
         ivals = merge_dicts(ivals, pars)
     
     return ivals
+
 
 def merge_dicts(*dict_args):
     """
@@ -108,6 +114,3 @@ def merge_dicts(*dict_args):
     return result
 
 # end of glmnetControl()
-
-        
-        

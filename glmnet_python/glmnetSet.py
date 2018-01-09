@@ -185,41 +185,46 @@ AUTHORS:
     Department of Statistics, Stanford University, Stanford, California, USA.
 
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
 
-def glmnetSet(opts = None):
+
+def glmnetSet(opts=None):
     import scipy
     
     # default options
     options = {
-        "weights"             : scipy.empty([0]),
-        "offset"              : scipy.empty([0]),
-        "alpha"               : scipy.float64(1.0),
-        "nlambda"             : scipy.int32(100),
-        "lambda_min"          : scipy.empty([0]),
-        "lambdau"             : scipy.empty([0]),
-        "standardize"         : True,
-        "intr"                : True,
-        "thresh"              : scipy.float64(1e-7),
-        "dfmax"               : scipy.empty([0]),
-        "pmax"                : scipy.empty([0]),
-        "exclude"             : scipy.empty([0], dtype = scipy.integer),
-        "penalty_factor"      : scipy.empty([0]),
-        "cl"                  : scipy.array([[scipy.float64(-scipy.inf)], [scipy.float64(scipy.inf)]]), 
-        "maxit"               : scipy.int32(1e5),
-        "gtype"               : [],
-        "ltype"               : 'Newton',
-        "standardize_resp"    : False,
-        "mtype"               : 'ungrouped'
+        "weights": scipy.empty([0]),
+        "offset": scipy.empty([0]),
+        "alpha": scipy.float64(1.0),
+        "nlambda": scipy.int32(100),
+        "lambda_min": scipy.empty([0]),
+        "lambdau": scipy.empty([0]),
+        "standardize": True,
+        "intr": True,
+        "thresh": scipy.float64(1e-7),
+        "dfmax": scipy.empty([0]),
+        "pmax": scipy.empty([0]),
+        "exclude": scipy.empty([0], dtype=scipy.integer),
+        "penalty_factor": scipy.empty([0]),
+        "cl": scipy.array([[scipy.float64(-scipy.inf)], [scipy.float64(scipy.inf)]]),
+        "maxit": scipy.int32(1e5),
+        "gtype": [],
+        "ltype": 'Newton',
+        "standardize_resp": False,
+        "mtype": 'ungrouped'
    }
     
     # quick return if no user opts
-    if opts == None:
+    if opts is None:
         print('pdco default options:')
         print(options)
         return options
     
     # if options are passed in by user, update options with values from opts
-    optsInOptions = set(opts.keys()) - set(options.keys());
+    optsInOptions = set(opts.keys()) - set(options.keys())
     if len(optsInOptions) > 0:          # assert 'opts' keys are subsets of 'options' keys
         print(optsInOptions, ' : unknown option for glmnetSet')
         raise ValueError('attempting to set glmnet options that are not known to glmnetSet')
@@ -227,6 +232,7 @@ def glmnetSet(opts = None):
         options = merge_dicts(options, opts)
     
     return options
+
 
 def merge_dicts(*dict_args):
     """

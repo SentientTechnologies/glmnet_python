@@ -10,11 +10,16 @@
 # website: hanfang.github.io
 # date: 3/1/2017
 # ----------------------------------------
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
 
 import sys
 import os
 import numpy as np
 from scipy import sparse
+
 
 class dataprocess(object):
     """
@@ -45,8 +50,10 @@ class dataprocess(object):
         else:
             raise ValueError("Only accept csc or csr")
 
+
 def main():
     dataprocess.sparseDf()
+
 
 if __name__ == '__main__':
     main()

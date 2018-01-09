@@ -3,21 +3,27 @@
 Internal cvglmnet function. See also cvglmnet.
 
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 import scipy
 from glmnetPredict import glmnetPredict
 from wtmean import wtmean
 from cvcompute import cvcompute
 
-def cvfishnet(fit, \
-            lambdau, \
-            x, \
-            y, \
-            weights, \
-            offset, \
-            foldid, \
-            ptype, \
-            grouped, \
-            keep = False):
+
+def cvfishnet(fit,
+              lambdau,
+              x,
+              y,
+              weights,
+              offset,
+              foldid,
+              ptype,
+              grouped,
+              keep=False):
     
     typenames = {'deviance':'Poisson Deviance', 'mse':'Mean-Squared Error', 
                  'mae':'Mean Absolute Error'}
@@ -83,16 +89,16 @@ def cvfishnet(fit, \
     if keep:
         result['fit_preval'] = predmat
         
-    return(result)
+    return result
 
 # end of cvfishnet
-#=========================    
+#=========================
 def devi(yy, eta):
     deveta = yy*eta - scipy.exp(eta)
     devy = yy*scipy.log(yy) - yy
     devy[yy == 0] = 0
     result = 2*(devy - deveta)
-    return(result)
+    return result
     
 
 

@@ -47,6 +47,11 @@
     glmnetPrint(fit);
 
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 
 def glmnetPrint(fit):
 
@@ -55,5 +60,3 @@ def glmnetPrint(fit):
     for i in range(N):
         line_p = '%d \t %f \t %f \t %f' % (i, fit['df'][i], fit['dev'][i], fit['lambdau'][i])
         print(line_p)
-
-

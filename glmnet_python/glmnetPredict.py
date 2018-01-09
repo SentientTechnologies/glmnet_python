@@ -103,19 +103,24 @@ EXAMPLES:
     print(glmnetPredict(fit3, x[0:3,:], scipy.array([0.01, 0.5]), 'response'))
     
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 import scipy
 import scipy.interpolate
 
-def glmnetPredict(fit,\
-                  newx = scipy.empty([0]), \
-                  s = scipy.empty([0]), \
-                  ptype = 'link', \
-                  exact = False, \
-                  offset = scipy.empty([0])):
+def glmnetPredict(fit,
+                  newx=scipy.empty([0]),
+                  s=scipy.empty([0]),
+                  ptype='link',
+                  exact=False,
+                  offset=scipy.empty([0])):
     
     typebase = ['link', 'response', 'coefficients', 'nonzero', 'class']
-    indxtf   = [x.startswith(ptype.lower()) for x in typebase]
-    indl     = [i for i in range(len(indxtf)) if indxtf[i] == True]
+    indxtf = [x.startswith(ptype.lower()) for x in typebase]
+    indl = [i for i in range(len(indxtf)) if indxtf[i] == True]
     ptype = typebase[indl[0]]
     
     if newx.shape[0] == 0 and ptype != 'coefficients' and ptype != 'nonzero':
@@ -157,14 +162,13 @@ def glmnetPredict(fit,\
             
         if ptype == 'coefficients':
             result = nbeta
-            return(result)
+            return result
             
         if ptype == 'nonzero':
             result = nonzeroCoef(nbeta[1:nbeta.shape[0], :], True)
-            return(result)
+            return result
         # use scipy.sparse.hstack instead of column_stack for sparse matrices        
-        result = scipy.dot(scipy.column_stack( (scipy.ones([newx.shape[0], 1]) \
-                              , newx) ) , nbeta)
+        result = scipy.dot(scipy.column_stack((scipy.ones([newx.shape[0], 1]), newx)), nbeta)
         if fit['offset']:
             if len(offset) == 0:
                 raise ValueError('No offset provided for prediction, yet used in fit of glmnet')
@@ -213,7 +217,7 @@ def glmnetPredict(fit,\
 
         if ptype == 'coefficients':
             result = nbeta
-            return(result)
+            return result
             
         if ptype == 'nonzero':
             if fit['grouped']:
@@ -225,13 +229,13 @@ def glmnetPredict(fit,\
                 for i in range(nclass):
                     tn = nbeta[0].shape[0]
                     result.append(nonzeroCoef(nbeta[0][1:tn, :], True))  
-            return(result)
+            return result
             
         npred = newx.shape[0]
-        dp = scipy.zeros([nclass, nlambda, npred], dtype = scipy.float64)
+        dp = scipy.zeros([nclass, nlambda, npred], dtype=scipy.float64)
         for i in range(nclass):
-            qq = scipy.column_stack( (scipy.ones([newx.shape[0], 1]), newx) )
-            fitk = scipy.dot( qq, nbeta[i] )
+            qq = scipy.column_stack((scipy.ones([newx.shape[0], 1]), newx))
+            fitk = scipy.dot(qq, nbeta[i])
             dp[i, :, :] = dp[i, :, :] + scipy.reshape(scipy.transpose(fitk), [1, nlambda, npred])
 
         if fit['offset']:
@@ -245,7 +249,7 @@ def glmnetPredict(fit,\
                 
         if ptype == 'response':
             pp = scipy.exp(dp)
-            psum = scipy.sum(pp, axis = 0, keepdims = True)
+            psum = scipy.sum(pp, axis=0, keepdims=True)
             result = scipy.transpose(pp/scipy.tile(psum, [nclass, 1, 1]), [2, 0, 1])
         if ptype == 'link':
             result = scipy.transpose(dp, [2, 0, 1])
@@ -267,11 +271,11 @@ def glmnetPredict(fit,\
             
         if ptype == 'coefficients':
             result = nbeta
-            return(result)
+            return result
             
         if ptype == 'nonzero':
             result = nonzeroCoef(nbeta, True)
-            return(result)
+            return result
         
         result = scipy.dot(newx * nbeta)
         
@@ -284,7 +288,7 @@ def glmnetPredict(fit,\
         if ptype == 'response':
             result = scipy.exp(result)
 
-    return(result)
+    return result
     
 # end of glmnetPredict
 # =========================================    
@@ -302,9 +306,9 @@ def lambda_interp(lambdau, s):
 # sfrac*left+(1-sfrac*right)
     if len(lambdau) == 1:
         nums = len(s)
-        left = scipy.zeros([nums, 1], dtype = scipy.integer)
+        left = scipy.zeros([nums, 1], dtype=scipy.integer)
         right = left
-        sfrac = scipy.zeros([nums, 1], dtype = scipy.float64)
+        sfrac = scipy.zeros([nums, 1], dtype=scipy.float64)
     else:
         s[s > scipy.amax(lambdau)] = scipy.amax(lambdau)
         s[s < scipy.amin(lambdau)] = scipy.amin(lambdau)
@@ -312,8 +316,8 @@ def lambda_interp(lambdau, s):
         sfrac = (lambdau[0] - s)/(lambdau[0] - lambdau[k - 1])
         lambdau = (lambdau[0] - lambdau)/(lambdau[0] - lambdau[k - 1]) 
         coord = scipy.interpolate.interp1d(lambdau, range(k))(sfrac)
-        left = scipy.floor(coord).astype(scipy.integer, copy = False)
-        right = scipy.ceil(coord).astype(scipy.integer, copy = False)
+        left = scipy.floor(coord).astype(scipy.integer, copy=False)
+        right = scipy.ceil(coord).astype(scipy.integer, copy=False)
         #
         tf = left != right
         sfrac[tf] = (sfrac[tf] - lambdau[right[tf]])/(lambdau[left[tf]] - lambdau[right[tf]])
@@ -328,13 +332,15 @@ def lambda_interp(lambdau, s):
     result['right'] = right
     result['frac'] = sfrac
     
-    return(result)
+    return result
 # end of lambda_interp    
-# =========================================    
-def softmax(x, gap = False):
+# =========================================
+
+
+def softmax(x, gap=False):
    d = x.shape
    maxdist = x[:, 0]
-   pclass = scipy.zeros([d[0], 1], dtype = scipy.integer)
+   pclass = scipy.zeros([d[0], 1], dtype=scipy.integer)
    for i in range(1, d[1], 1):
        l = x[:, i] > maxdist
        pclass[l] = i
@@ -351,16 +357,17 @@ def softmax(x, gap = False):
        #result['gaps'] = gaps
        raise ValueError('gap = True is not implemented yet')
    else:
-       result['pclass'] = pclass;
+       result['pclass'] = pclass
   
    return(result)
 # end of softmax
-# =========================================    
-def nonzeroCoef(beta, bystep = False):
+# =========================================
+
+
+def nonzeroCoef(beta, bystep=False):
     result = scipy.absolute(beta) > 0
     if not bystep:
-        result = scipy.any(result, axis = 1)
-    return(result)    
+        result = scipy.any(result, axis=1)
+    return result
 # end of nonzeroCoef
-# =========================================    
-     
+# =========================================

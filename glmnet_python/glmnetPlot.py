@@ -71,10 +71,15 @@
      plt.figure()
      glmnetPlot(fit3)
 """
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from builtins import range
+
 import scipy
 
 
-def glmnetPlot(x, xvar = 'norm', label = False, ptype = 'coef', **options):
+def glmnetPlot(x, xvar='norm', label=False, ptype='coef', **options):
     import matplotlib.pyplot as plt
 
     # process inputs
@@ -82,8 +87,8 @@ def glmnetPlot(x, xvar = 'norm', label = False, ptype = 'coef', **options):
     ptype = getFromList(ptype, ['coef', '2norm'], 'ptype should be one of ''coef'', ''2norm'' ')    
 
     if x['class'] in ['elnet', 'lognet', 'coxnet', 'fishnet']:
-        handle = plotCoef(x['beta'], [], x['lambdau'], x['df'], x['dev'], 
-        label, xvar, '', 'Coefficients', **options)
+        handle = plotCoef(x['beta'], [], x['lambdau'], x['df'], x['dev'],
+                          label, xvar, '', 'Coefficients', **options)
 
     elif x['class'] in ['multnet', 'mrelnet']:
         beta = x['beta']
@@ -93,7 +98,7 @@ def glmnetPlot(x, xvar = 'norm', label = False, ptype = 'coef', **options):
             for i in range(len(beta)):
                 which = nonzeroCoef(beta[i])
                 nzbeta[i] = beta[i][which, :]
-                norm = norm + scipy.sum(scipy.absolute(nzbeta[i]), axis = 0)
+                norm = norm + scipy.sum(scipy.absolute(nzbeta[i]), axis=0)
         else:
             norm = 0
         
@@ -107,11 +112,11 @@ def glmnetPlot(x, xvar = 'norm', label = False, ptype = 'coef', **options):
                     if i < ncl - 1:         
                         plt.figure()             
             else:
-                    str = 'Coefficients: Response %d' % (i) 
-                    handle = plotCoef(beta[i], norm, x['lambdau'], x['dfmat'][i,:], 
-                             x['dev'], label, xvar, '', str, **options)
+                str = 'Coefficients: Response %d' % (i)
+                handle = plotCoef(beta[i], norm, x['lambdau'], x['dfmat'][i,:],
+                                  x['dev'], label, xvar, '', str, **options)
         else:
-            dfseq = scipy.round_(scipy.mean(x['dfmat'], axis = 0))
+            dfseq = scipy.round_(scipy.mean(x['dfmat'], axis=0))
             coefnorm = beta[1]*0
             for i in range(len(beta)):
                 coefnorm = coefnorm + scipy.absolute(beta[i])**2
@@ -119,18 +124,19 @@ def glmnetPlot(x, xvar = 'norm', label = False, ptype = 'coef', **options):
             if x['class'] == 'multnet':
                 str = 'Coefficient 2Norms'
                 handle = plotCoef(coefnorm, norm, x['lambdau'], dfseq, x['dev'],
-                         label, xvar, '',str, **options);
-                if i < ncl - 1:                         
-                    plt.figure()         
+                                  label, xvar, '',str, **options)
+                if i < ncl - 1:
+                    plt.figure()
             else:
                 str = 'Coefficient 2Norms'
                 handle = plotCoef(coefnorm, norm, x['lambdau'], x['dfmat'][0,:], x['dev'],
-                         label, xvar, '', str, **options);                
+                                  label, xvar, '', str, **options)
 
-    return(handle)
+    return handle
 # end of glmnetplot
 # =========================================
-#
+
+
 # =========================================
 # helper functions
 # =========================================
@@ -144,16 +150,20 @@ def getFromList(xvar, xvarbase, errMsg):
     return xvar    
 # end of getFromList()
 # =========================================
-def nonzeroCoef(beta, bystep = False):
+
+
+def nonzeroCoef(beta, bystep=False):
     result = scipy.absolute(beta) > 0
     if len(result.shape) == 1:
         result = scipy.reshape(result, [result.shape[0], 1])
     if not bystep:
-        result = scipy.any(result, axis = 1)
+        result = scipy.any(result, axis=1)
     
-    return(result)
+    return result
 # end of nonzeroCoef()
 # =========================================
+
+
 def plotCoef(beta, norm, lambdau, df, dev, label, xvar, xlab, ylab, **options):
     import matplotlib.pyplot as plt
 
@@ -168,7 +178,7 @@ def plotCoef(beta, norm, lambdau, df, dev, label, xvar, xlab, ylab, **options):
     beta = beta[which, :]
     if xvar == 'norm':
         if len(norm) == 0:
-            index = scipy.sum(scipy.absolute(beta), axis = 0)
+            index = scipy.sum(scipy.absolute(beta), axis=0)
         else:
             index = norm
         iname = 'L1 Norm'
@@ -208,7 +218,7 @@ def plotCoef(beta, norm, lambdau, df, dev, label, xvar, xlab, ylab, **options):
     prettydf = df[indat]
     prettydf[-1] = df[-1]        
     
-    ax2.set(XLim=[min(index), max(index)], XTicks = atdf, XTickLabels = prettydf)
+    ax2.set(XLim=[min(index), max(index)], XTicks=atdf, XTickLabels=prettydf)
     ax2.grid()
     ax1.yaxis.grid()
 
