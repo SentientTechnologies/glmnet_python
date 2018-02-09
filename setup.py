@@ -5,8 +5,10 @@ from setuptools import setup, find_packages
 cmd = 'gfortran ./glmnet_python/GLMnet.f -fPIC -fdefault-real-8 -shared -o ./glmnet_python/GLMnet.so'
 os.system(cmd)
 
+exec(open('glmnet_python/_version.py').read())
+
 setup(name='glmnet_python',
-      version = '0.2.0',
+      version =__version__,
       description = 'Python version of glmnet, from Stanford University',
       long_description=open('README.md').read(),
       url="https://github.com/bbalasub1/glmnet_python",
